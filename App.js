@@ -6,7 +6,6 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="auto"/>
       <Text>Este es signal app!</Text>
-      <StatusBar style="auto" />
     </View>
   );
 }
