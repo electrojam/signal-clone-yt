@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
-import { View, Text } from 'react-native'
+import { KeyboardAvoidingView, View, Platform, StyleSheet, Text } from 'react-native'
 import { Button, Image, Input } from "@rneui/themed";
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
 
   const signIn = () => {
 
@@ -41,7 +40,12 @@ const LoginScreen = () => {
       </View>
 
       <Button containerStyle={styles.button} onPress={signIn} title="login" />
-      <Button containerStyle={styles.button} type="outline" title="Register" />
+      <Button 
+        onPress={() => navigation.navigate("Register")} 
+        containerStyle={styles.button} 
+        type="outline" 
+        title="Register" 
+      />
       <View style={{ height: 100 }}/>
     </KeyboardAvoidingView>
   )
