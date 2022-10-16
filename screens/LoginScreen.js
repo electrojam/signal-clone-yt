@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, View, Platform, StyleSheet } from 'react-native'
 import { Button, Image, Input } from "@rneui/themed";
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("")
@@ -19,7 +20,8 @@ const LoginScreen = ({ navigation }) => {
   }, [])
 
   const signIn = () => {
-
+    signInWithEmailAndPassword(auth, email, password)
+    .catch((error) => alert(error))
   }
 
   return (
@@ -46,6 +48,7 @@ const LoginScreen = ({ navigation }) => {
           type="password"
           value={password} 
           onChangeText={(text) => setPassword(text)}
+          onSubmitEditing={signIn}
         />
       </View>
 
