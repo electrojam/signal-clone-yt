@@ -28,7 +28,7 @@ const createChat = async () => {
 }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Input 
         placeholder="Ingrese un nombre para el chat" 
         value={input}
@@ -45,4 +45,10 @@ const createChat = async () => {
 
 export default AddChatScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    padding: 30,
+    height: "100%",
+  }
+})

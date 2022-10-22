@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native'
 
 export default function CustomListItem({ id, chatName, enterChat }) {
   return (
-    <ListItem>
+    <ListItem key={id} bottomDivider>
       <Avatar 
         rounded
         source={{
@@ -15,11 +15,10 @@ export default function CustomListItem({ id, chatName, enterChat }) {
       />
       <ListItem.Content>
         <ListItem.Title style={{ fontWeight: "800" }}>
-          Youtube Chat
+          {chatName} 
         </ListItem.Title>
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-          This is a test subtitle This is a test subtitle This is a test subtitle
-          This is a test subtitle This is a test subtitle This is a test subtitle
+          ABCDE
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>
