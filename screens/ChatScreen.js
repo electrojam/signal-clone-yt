@@ -151,7 +151,7 @@ export default function ChatScreen({ navigation, route }) {
                   <Text style={styles.receiverText}>{data.message}</Text>
                 </View>
               ):(
-                <View style={styles.sender}>
+                <View key={id} style={styles.sender}>
                   <Avatar 
                     position="absolute"
                     rounded
