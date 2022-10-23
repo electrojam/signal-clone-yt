@@ -6,7 +6,7 @@ import CustomListItem from '../components/CustomListItem'
 import { auth } from '../firebase'
 import { signOut } from 'firebase/auth';
 import { AntDesign, SimpleLineIcons } from '@expo/vector-icons'
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, getDocs, query } from 'firebase/firestore'
 import { db } from '../firebase'
 
 export default function HomeScreen({ navigation }) {
@@ -19,7 +19,7 @@ export default function HomeScreen({ navigation }) {
     })
   }
 
-  const postCollectionRef = collection(db, "chats")
+  const postCollectionRef = query(collection(db, "chats"))
 
     useEffect(() => {
       const unsubscribe = async () => {

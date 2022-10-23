@@ -15,7 +15,7 @@ import {
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { auth, db } from '../firebase'
-import { collection, addDoc, orderBy, getDocs } from "firebase/firestore"
+import { collection, addDoc, orderBy, getDocs, query } from "firebase/firestore"
 import { serverTimestamp } from "firebase/firestore";
 
 export default function ChatScreen({ navigation, route }) {
@@ -40,7 +40,7 @@ export default function ChatScreen({ navigation, route }) {
             rounded 
             source={{ 
               uri: 
-                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png" 
+                messages[0]?.data.photoURL,
             }} 
           />
           <Text
@@ -76,9 +76,11 @@ export default function ChatScreen({ navigation, route }) {
         </View>
       )
     })
-  }, [navigation])
+  }, [navigation, messages])
 
   const sendMessage = async() => {
+    if (!input) return
+
     Keyboard.dismiss()
 
     await addDoc(
@@ -98,8 +100,10 @@ export default function ChatScreen({ navigation, route }) {
   useLayoutEffect(() => {
     const unsubscribe = async () => {
       const data = await getDocs(
-        collection(db, "chats", route.params.id, "messages"),
-        orderBy("timestamp", "desc" )
+        query(
+          collection(db, "chats", route.params.id, "messages"),
+          orderBy("timestamp", "desc")
+        )
       )
 
       setMessages(
@@ -112,7 +116,7 @@ export default function ChatScreen({ navigation, route }) {
     }
 
     unsubscribe()
-  }, [route])
+  }, [route, messages])
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -124,17 +128,48 @@ export default function ChatScreen({ navigation, route }) {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <>
-          <ScrollView>
+          <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
             {messages.map(({id, data}) => (
               data.email === auth.currentUser.email ? (
                 <View key={id} style={styles.receiver}>
-                  <Avatar />
+                  <Avatar 
+                    position="absolute"
+                    rounded
+                    bottom={-15}
+                    right={-5}
+                    // WEB
+                    containerStyle={{
+                      position: "absolute",
+                      bottom: -15,
+                      right: -5,
+                    }}
+                    size={30}
+                    source={{ 
+                      uri: data.photoURL, 
+                    }}
+                  />
                   <Text style={styles.receiverText}>{data.message}</Text>
                 </View>
               ):(
                 <View style={styles.sender}>
-                  <Avatar />
+                  <Avatar 
+                    position="absolute"
+                    rounded
+                    bottom={-15}
+                    left={-5}
+                    // WEB
+                    containerStyle={{
+                      position: "absolute",
+                      bottom: -15,
+                      left: -5,
+                    }}
+                    size={30}
+                    source={{ 
+                      uri: data.photoURL, 
+                    }}
+                  />
                   <Text style={styles.senderText}>{data.message}</Text>
+                  <Text style={styles.senderName}>{data.displayName}</Text>
                 </View>
               )
             ))}
@@ -171,6 +206,27 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 15,
   },
+  sender: {
+    padding: 15,
+    backgroundColor: "#2B68E6",
+    alignSelf: "flex-start",
+    borderRadius: 20,
+    margin: 15,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  senderName: {
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+    color: "white",
+  },
+  senderText: {
+    color: "white",
+    fontWeight: "500",
+    marginLeft: 10,
+    marginBottom: 15,
+  },
   receiver: {
     padding: 15,
     backgroundColor: "#ECECEC",
@@ -180,6 +236,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     maxWidth: "80%",
     position: "relative",
+  },
+  receiverText: {
+    color: "black",
+    fontWeight: "500",
+    marginLeft: 10,
   },
   textInput: {
     bottom: 0,
