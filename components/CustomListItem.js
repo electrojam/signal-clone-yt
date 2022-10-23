@@ -1,15 +1,40 @@
+import React, { useEffect, useState } from 'react'
 import { Avatar, ListItem } from '@rneui/themed'
-import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { collection, getDocs, orderBy, query } from 'firebase/firestore'
+import { db } from '../firebase'
 
 
 export default function CustomListItem({ id, chatName, enterChat }) {
+  const [chatMessages, setChatMessages] = useState([])
+
+  useEffect(() => {
+    const unsubscribe = async () => {
+      const data = await getDocs(
+        query(
+          collection(db, "chats", id, "messages"),
+          orderBy("timestamp", "desc")
+        )
+      ) 
+
+      setChatMessages(
+        data.docs.map((doc) => 
+          doc.data()
+        )
+      )
+    }
+
+    unsubscribe()
+  })
+  
+
   return (
-    <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
+    <ListItem key={id} onPress={() => enterChat(id, chatName)} bottomDivider>
       <Avatar 
         rounded
         source={{
-          uri:
+          uri: 
+            chatMessages?.[0]?.photoURL ||
             "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png",
         }}
       />
@@ -18,7 +43,7 @@ export default function CustomListItem({ id, chatName, enterChat }) {
           {chatName} 
         </ListItem.Title>
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-          ABCDE
+          {chatMessages?.[0]?.displayName}: {chatMessages?.[0]?.message}
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>
