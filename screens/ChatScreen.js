@@ -15,12 +15,13 @@ import {
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { auth, db } from '../firebase'
-import { collection, addDoc } from "firebase/firestore"
+import { collection, addDoc, orderBy, getDocs } from "firebase/firestore"
 import { serverTimestamp } from "firebase/firestore";
 
 export default function ChatScreen({ navigation, route }) {
 
   const [input, setInput] = useState('')
+  const [messages, setMessages] = useState([])
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -94,6 +95,25 @@ export default function ChatScreen({ navigation, route }) {
 
   }
 
+  useLayoutEffect(() => {
+    const unsubscribe = async () => {
+      const data = await getDocs(
+        collection(db, "chats", route.params.id, "messages"),
+        orderBy("timestamp", "desc" )
+      )
+
+      setMessages(
+        data.docs.map((doc) => ({
+          id: doc.id, 
+          data: doc.data(),
+        }))
+      )
+      
+    }
+
+    unsubscribe()
+  }, [route])
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar style="light" />
@@ -105,8 +125,19 @@ export default function ChatScreen({ navigation, route }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <>
           <ScrollView>
-            {/* Chat goes here */}
-
+            {messages.map(({id, data}) => (
+              data.email === auth.currentUser.email ? (
+                <View key={id} style={styles.receiver}>
+                  <Avatar />
+                  <Text style={styles.receiverText}>{data.message}</Text>
+                </View>
+              ):(
+                <View style={styles.sender}>
+                  <Avatar />
+                  <Text style={styles.senderText}>{data.message}</Text>
+                </View>
+              )
+            ))}
           </ScrollView>
           <View style={styles.footer}>
             <TextInput 
@@ -139,6 +170,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     padding: 15,
+  },
+  receiver: {
+    padding: 15,
+    backgroundColor: "#ECECEC",
+    alignSelf: "flex-end",
+    borderRadius: 20,
+    marginRight: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
   },
   textInput: {
     bottom: 0,
